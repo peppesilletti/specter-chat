@@ -12,9 +12,11 @@
 		"cookie-parser": "~1.4.4",
 		"debug": "~2.6.9",
 		"express": "~4.16.1",
-		"morgan": "~1.9.1"
+		"morgan": "~1.9.1",
+		"uuid": "^8.3.2"
 	},
 	"devDependencies": {
+		"@faker-js/faker": "^7.2.0",
 		"nodemon": "^2.0.16",
 		"supertest": "^6.2.3",
 		"tap": "^16.2.0"
