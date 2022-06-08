@@ -8,6 +8,7 @@ import users from '../fixtures/users.json'
 
 tap.test('Comments API', async () => {
 	tap.test('Comments CRUD - Happy Path', async () => {
+		// Create comment
 		const commentToCreate = createCommentDto({
 			overrides: {
 				authorId: users[0].id,
@@ -25,6 +26,14 @@ tap.test('Comments API', async () => {
 			id: String,
 			publishedAt: String,
 		})
+
+		// Get comments
+		const getCommentsResponse = await request(app)
+			.get('/api/comments')
+			.set('Accept', 'application/json')
+
+		tap.same(getCommentsResponse.status, 200)
+		tap.match(getCommentsResponse.body, [addCommentResponse.body])
 
 		tap.end()
 	})

@@ -6,29 +6,7 @@ const router = express.Router()
 const comments = []
 
 router.get('/', function (req, res) {
-	res.json([
-		{
-			id: 1,
-			author: 'John Doe',
-			publishedAt: new Date(),
-			content: 'I am a comment!',
-			upvotes: 0,
-		},
-		{
-			id: 2,
-			author: 'John Doe',
-			publishedAt: new Date(),
-			content: 'I am a comment!',
-			upvotes: 0,
-		},
-		{
-			id: 3,
-			author: 'John Doe',
-			publishedAt: new Date(),
-			content: 'I am a comment!',
-			upvotes: 0,
-		},
-	])
+	res.json(comments)
 })
 
 router.post('/', (req, res) => {
