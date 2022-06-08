@@ -6,8 +6,8 @@ import app from '../app'
 
 import users from '../fixtures/users.json'
 
-tap.test('Comments API', async () => {
-	tap.test('Comments CRUD - Happy Path', async () => {
+tap.test('Comments API', t => {
+	tap.test('Create and fetch comments - Happy Path', async t => {
 		// Create comment
 		const commentToCreate = createCommentDto({
 			overrides: {
@@ -20,8 +20,8 @@ tap.test('Comments API', async () => {
 			.send(commentToCreate)
 			.set('Accept', 'application/json')
 
-		tap.same(addCommentResponse.status, 201)
-		tap.match(addCommentResponse.body, {
+		t.same(addCommentResponse.status, 201)
+		t.match(addCommentResponse.body, {
 			...commentToCreate,
 			id: String,
 			publishedAt: String,
@@ -32,13 +32,70 @@ tap.test('Comments API', async () => {
 			.get('/api/comments')
 			.set('Accept', 'application/json')
 
-		tap.same(getCommentsResponse.status, 200)
-		tap.match(getCommentsResponse.body, [addCommentResponse.body])
+		t.same(getCommentsResponse.status, 200)
+		t.match(getCommentsResponse.body, [addCommentResponse.body])
 
-		tap.end()
+		t.end()
 	})
 
-	tap.end()
+	tap.test(
+		"It should return an error if the author's id is not sent when creating a comment",
+		async t => {
+			const addCommentResponse = await request(app)
+				.post('/api/comments')
+				.send(createCommentDto())
+				.set('Accept', 'application/json')
+
+			t.same(addCommentResponse.status, 400)
+			t.same(addCommentResponse.body, {
+				message: 'Missing parameter in comment dto',
+				field: 'authorId',
+			})
+
+			t.end()
+		},
+	)
+
+	tap.test(
+		'It should return an error if the content is not sent when creating a comment',
+		async t => {
+			const addCommentResponse = await request(app)
+				.post('/api/comments')
+				.send({ authorId: 1 })
+				.set('Accept', 'application/json')
+
+			t.same(addCommentResponse.status, 400)
+			t.same(addCommentResponse.body, {
+				message: 'Missing parameter in comment dto',
+				field: 'content',
+			})
+
+			t.end()
+		},
+	)
+
+	tap.test('It should return an error if author does not exist', async t => {
+		const notExistingAuthorId = 100
+
+		const addCommentResponse = await request(app)
+			.post('/api/comments')
+			.send(
+				createCommentDto({
+					overrides: { authorId: notExistingAuthorId },
+				}),
+			)
+			.set('Accept', 'application/json')
+
+		t.same(addCommentResponse.status, 400)
+		t.same(addCommentResponse.body, {
+			message: `Author with id ${notExistingAuthorId} does not exist`,
+			field: 'authorId',
+		})
+
+		t.end()
+	})
+
+	t.end()
 })
 
 function createCommentDto({ overrides = {} } = {}) {
