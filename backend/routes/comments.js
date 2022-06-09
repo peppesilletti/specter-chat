@@ -39,6 +39,7 @@ router.post('/', (req, res) => {
 		publishedAt: new Date().toISOString(),
 		id: uuidv4(),
 		upvotes: 0,
+		parentId: req.body.parentId,
 	}
 
 	comments.push(commentToSave)
@@ -78,6 +79,10 @@ function _mapStoreCommentToCommentResponseDto(comment) {
 		publishedAt: comment.publishedAt,
 		author: users.find(user => user.id === comment.authorId),
 		upvotes: comment.upvotes,
+		children: comments
+			.filter(existingComment => existingComment.parentId === comment.id)
+			.map(_mapStoreCommentToCommentResponseDto),
+		parentId: comment.parentId,
 	}
 }
 

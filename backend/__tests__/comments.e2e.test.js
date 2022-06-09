@@ -7,7 +7,7 @@ import app from '../app'
 import users from '../fixtures/users.json'
 
 tap.test('Comments API', t => {
-	tap.test('Create and fetch comments - Happy Path', async t => {
+	tap.skip('Create and fetch comments - Happy Path', async t => {
 		// Create comment
 		const commentToCreate = createCommentDto({
 			overrides: {
@@ -52,7 +52,52 @@ tap.test('Comments API', t => {
 		t.end()
 	})
 
-	tap.test(
+	tap.test('Add nested comment to existing comment - Happy Path', async t => {
+		const addCommentResponse = await request(app)
+			.post('/api/comments')
+			.send(
+				createCommentDto({
+					overrides: {
+						authorId: users[0].id,
+					},
+				}),
+			)
+			.set('Accept', 'application/json')
+
+		const createdComment = addCommentResponse.body
+
+		// Create nested comment
+		const nestedCommentToCreate = createCommentDto({
+			overrides: {
+				authorId: users[0].id,
+				parentId: createdComment.id,
+			},
+		})
+
+		const addNestedCommentResponse = await request(app)
+			.post(`/api/comments`)
+			.send(nestedCommentToCreate)
+			.set('Accept', 'application/json')
+
+		const createdNestedComment = addNestedCommentResponse.body
+
+		// Get comments
+		const getCommentsResponse = await request(app)
+			.get('/api/comments')
+			.set('Accept', 'application/json')
+
+		t.same(getCommentsResponse.status, 200)
+
+		const fetchedCreatedComment = getCommentsResponse.body.find(
+			comment => comment.id === createdComment.id,
+		)
+
+		t.same(fetchedCreatedComment.children, [createdNestedComment])
+
+		t.end()
+	})
+
+	tap.skip(
 		"Create Comment - It should return an error if the author's id is not sent when creating a comment",
 		async t => {
 			const addCommentResponse = await request(app)
@@ -70,7 +115,7 @@ tap.test('Comments API', t => {
 		},
 	)
 
-	tap.test(
+	tap.skip(
 		'Create Comment - It should return an error if the content is not sent when creating a comment',
 		async t => {
 			const addCommentResponse = await request(app)
@@ -88,7 +133,7 @@ tap.test('Comments API', t => {
 		},
 	)
 
-	tap.test(
+	tap.skip(
 		'Create Comment - It should return an error if author does not exist',
 		async t => {
 			const notExistingAuthorId = 100
@@ -112,7 +157,7 @@ tap.test('Comments API', t => {
 		},
 	)
 
-	tap.test('Upvote a comment - Happy Path', async t => {
+	tap.skip('Upvote a comment - Happy Path', async t => {
 		// Create comment
 		const commentToCreate = createCommentDto({
 			overrides: {
@@ -146,7 +191,7 @@ tap.test('Comments API', t => {
 		t.end()
 	})
 
-	tap.test(
+	tap.skip(
 		'Upvote a comment - It should return an error if comment id does not exist',
 		async t => {
 			const notExistingCommentId = 100
