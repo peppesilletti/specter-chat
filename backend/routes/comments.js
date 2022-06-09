@@ -58,6 +58,8 @@ router.post('/:id/upvote', (req, res) => {
 	comments[commentToUpvoteIndex].upvotes =
 		comments[commentToUpvoteIndex].upvotes + 1
 
+	req.app.io.emit('COMMENT_UPVOTED', { commentId: id })
+
 	res.sendStatus(200)
 })
 
