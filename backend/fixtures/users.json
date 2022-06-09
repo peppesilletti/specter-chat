@@ -3,18 +3,18 @@
 		"id": 1,
 		"firstName": "Jon",
 		"lastName": "Snow",
-		"avatarUrl": "https://i.pravatar.cc/300"
+		"avatarUrl": "https://gravatar.com/avatar/aed45db8f8c47da256ece14e137de715?s=400&d=robohash&r=x"
 	},
 	{
 		"id": 2,
 		"firstName": "Tyrion",
 		"lastName": "Lannister",
-		"avatarUrl": "https://i.pravatar.cc/300"
+		"avatarUrl": "https://gravatar.com/avatar/d0d6f590f0dacb808fd6a8e1240b2fe6?s=400&d=robohash&r=x"
 	},
 	{
 		"id": 3,
 		"firstName": "Arya",
 		"lastName": "Stark",
-		"avatarUrl": "https://i.pravatar.cc/300"
+		"avatarUrl": "https://gravatar.com/avatar/70cfb6efe4b2696a14761ccd64d767af?s=400&d=robohash&r=x"
 	}
 ]
