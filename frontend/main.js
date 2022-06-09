@@ -1,5 +1,11 @@
-import { getComments, postComment, upvoteComment } from './api'
+import React from 'react'
+import ReactDOM from 'react-dom'
+
 import formatDistance from 'date-fns/formatDistance'
+import { getComments, postComment, upvoteComment } from './api'
+
+import Upvotes from './Upvotes'
+
 import './style.css'
 
 // Elements refs
@@ -103,9 +109,7 @@ function _addCommentToCommentList(comment) {
 					</div>
 					<div class="comment-container-header-separator">&bull;</div>
 					<div class="comment-container-header-upvotes">
-						Upvoted <span class="comment-container-header-upvotes-value">${
-							comment.upvotes
-						}</span> times
+						Upvoted <span class="comment-container-header-upvotes-value"></span> times
 					</div>
 				</div>
 
@@ -135,19 +139,33 @@ function _addCommentToCommentList(comment) {
 	)
 
 	commentsListDocEl.appendChild(commentEl)
+
+	// Render the upvotes with React
+	const upvotesEl = commentEl.getElementsByClassName(
+		'comment-container-header-upvotes-value',
+	)[0]
+
+	ReactDOM.render(
+		React.createElement(Upvotes, { upvotes: comment.upvotes }),
+		upvotesEl,
+	)
+
 	createCommentInputEl.value = ''
 }
 
 function _increaseCommentUpvotes(commentId = '') {
 	const commentEl = document.getElementById(`comment-${commentId}`)
-	const upvotesEl = commentEl.querySelector('.comment-container-header-upvotes')
-	const currentUpvotesValueEl = upvotesEl.querySelector(
-		'.comment-container-header-upvotes-value',
-	)
-	const currentUpvotesValue = currentUpvotesValueEl.innerHTML
-	const newUpvotesValue = `${parseInt(currentUpvotesValue) + 1}`
 
-	currentUpvotesValueEl.innerHTML = newUpvotesValue
+	const currentUpvotesValueEl = commentEl.getElementsByClassName(
+		'comment-container-header-upvotes-value',
+	)[0]
+
+	const newUpvotesValue = `${parseInt(currentUpvotesValueEl.innerHTML) + 1}`
+
+	ReactDOM.render(
+		React.createElement(Upvotes, { upvotes: newUpvotesValue }),
+		currentUpvotesValueEl,
+	)
 }
 
 init()
