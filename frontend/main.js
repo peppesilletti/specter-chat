@@ -1,5 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
+import { io } from 'socket.io-client'
 
 import formatDistance from 'date-fns/formatDistance'
 import { getComments, postComment, upvoteComment } from './api'
@@ -15,6 +16,12 @@ const commentsListDocEl = document.getElementById('comments-container')
 const loaderEl = document.getElementById('loader')
 
 function init() {
+	const socket = io('http://localhost:3001')
+
+	socket.on('COMMENT_UPVOTED', ({ commentId }) => {
+		_increaseCommentUpvotes(commentId)
+	})
+
 	createCommentButtonEl.addEventListener('click', onAddComment, false)
 	createCommentInputEl.addEventListener(
 		'keydown',
@@ -71,8 +78,6 @@ async function onUpvoteComment(comment) {
 	} catch {
 		alert("It's not possible to upvote the comment at the moment. Try later")
 	}
-
-	_increaseCommentUpvotes(comment.id)
 }
 
 function startLoading(loadingMessage = '') {
