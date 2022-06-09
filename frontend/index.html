@@ -17,11 +17,16 @@
 					</div>
 
 					<div id="create-comment-input-container">
-						<input id="create-comment-input" type="text" placeholder="What are your thoughts?" />
+						<input
+							data-testid="create-comment-input"
+							id="create-comment-input"
+							type="text"
+							placeholder="What are your thoughts?"
+						/>
 					</div>
 
 					<div id="create-comment-button-container">
-						<button id="create-comment-button" type="button">Comment</button>
+						<button data-testid="create-comment-button" id="create-comment-button" type="button">Comment</button>
 					</div>
 				</div>
 
@@ -29,7 +34,7 @@
 
 				<div id="loader"></div>
 
-				<div id="comments-container">
+				<div id="comments-container" data-testid="comments-container">
 				</div>
 			</div>
 		</div>

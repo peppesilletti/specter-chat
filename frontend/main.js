@@ -114,7 +114,7 @@ function _addCommentToCommentList(comment) {
 				</div>
 
 				<div class="comment-actions-container">
-					<div class="comment-actions-container-upvote">
+					<div class="comment-actions-container-upvote" data-testid="upvote-comment">
 						<div class="comment-actions-container-upvote-icon">&#9652;</div>
 						<div>Upvote</div>
 					</div>
