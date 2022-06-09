@@ -2,16 +2,19 @@
 	{
 		"id": 1,
 		"firstName": "Jon",
-		"lastName": "Snow"
+		"lastName": "Snow",
+		"avatarUrl": "https://i.pravatar.cc/300"
 	},
 	{
 		"id": 2,
 		"firstName": "Tyrion",
-		"lastName": "Lannister"
+		"lastName": "Lannister",
+		"avatarUrl": "https://i.pravatar.cc/300"
 	},
 	{
 		"id": 3,
 		"firstName": "Arya",
-		"lastName": "Stark"
+		"lastName": "Stark",
+		"avatarUrl": "https://i.pravatar.cc/300"
 	}
 ]

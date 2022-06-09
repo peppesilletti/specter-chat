@@ -7,7 +7,7 @@ const router = express.Router()
 const comments = []
 
 router.get('/', function (req, res) {
-	res.json(comments)
+	res.json(comments.map(_mapStoreCommentToCommentResponseDto))
 })
 
 router.post('/', (req, res) => {
@@ -26,25 +26,36 @@ router.post('/', (req, res) => {
 			.json({ message: missingParamErrorMsg, field: 'content' })
 	}
 
-	if (!userWithIdExists({ id: authorId })) {
+	if (!_userWithIdExists({ id: authorId })) {
 		return res.status(400).json({
 			message: `Author with id ${authorId} does not exist`,
 			field: 'authorId',
 		})
 	}
 
-	const newComment = {
-		...req.body,
+	const commentToSave = {
+		content: req.body.content,
+		authorId: req.body.authorId,
 		publishedAt: new Date().toISOString(),
 		id: uuidv4(),
 	}
 
-	comments.push(newComment)
-	res.status(201).json(newComment)
+	comments.push(commentToSave)
+
+	res.status(201).json(_mapStoreCommentToCommentResponseDto(commentToSave))
 })
 
-function userWithIdExists({ id }) {
+function _userWithIdExists({ id }) {
 	return users.some(user => user.id === id)
+}
+
+function _mapStoreCommentToCommentResponseDto(comment) {
+	return {
+		id: comment.id,
+		content: comment.content,
+		publishedAt: comment.publishedAt,
+		author: users.find(user => user.id === comment.authorId),
+	}
 }
 
 export default router
