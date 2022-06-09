@@ -7,7 +7,32 @@
 		<title>Vite App</title>
 	</head>
 	<body>
-		<div id="app"></div>
+		<div id="app">
+			<div id="container">
+				<h2>Discussion</h2>
+				
+				<div id="comments-form">
+					<div id="avatar-container">
+						<img src="https://gravatar.com/avatar/aed45db8f8c47da256ece14e137de715?s=400&d=robohash&r=x" alt="Avatar" class="avatar">
+					</div>
+
+					<div id="create-comment-input-container">
+						<input id="create-comment-input" type="text" placeholder="What are your thoughts?" />
+					</div>
+
+					<div id="create-comment-button-container">
+						<button id="create-comment-button" type="button">Comment</button>
+					</div>
+				</div>
+
+				<hr/>
+
+				<div id="loader"></div>
+
+				<div id="comments-container">
+				</div>
+			</div>
+		</div>
 		<script type="module" src="/main.js"></script>
 	</body>
 </html>
