@@ -1,6 +1,7 @@
 import express from 'express'
 import cors from 'cors'
 import logger from 'morgan'
+import { Server } from 'socket.io'
 
 import commentsRouter from './routes/comments'
 

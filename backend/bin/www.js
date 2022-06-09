@@ -7,6 +7,7 @@
 import app from '../app'
 import debug from 'debug'
 import http from 'http'
+import { Server } from 'socket.io'
 
 /**
  * Get port from environment and store in Express.
@@ -20,6 +21,19 @@ app.set('port', port)
  */
 
 const server = http.createServer(app)
+
+/**
+ * Set up Socker.io
+ */
+
+const io = new Server(server, {
+	cors: {
+		origin: '*',
+		methods: ['GET', 'POST'],
+	},
+})
+
+app.io = io
 
 /**
  * Listen on provided port, on all network interfaces.
