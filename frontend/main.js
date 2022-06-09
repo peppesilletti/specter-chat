@@ -1,43 +1,40 @@
+import { io } from 'socket.io-client'
 import React from 'react'
 import ReactDOM from 'react-dom'
-import { io } from 'socket.io-client'
+import Upvotes from './components/Upvotes'
 
-import formatDistance from 'date-fns/formatDistance'
 import { getComments, postComment, upvoteComment } from './api'
 
-import Upvotes from './Upvotes'
+import CommentForm from './components/CommentForm'
+import Comment from './components/Comment'
 
 import './style.css'
 
 // Elements refs
-const createCommentInputEl = document.getElementById('create-comment-input')
-const createCommentButtonEl = document.getElementById('create-comment-button')
 const commentsListDocEl = document.getElementById('comments-container')
 const loaderEl = document.getElementById('loader')
 
-function init() {
+function onMounted() {
 	const socket = io('http://localhost:3001')
 
 	socket.on('COMMENT_UPVOTED', ({ commentId }) => {
 		_increaseCommentUpvotes(commentId)
 	})
 
-	createCommentButtonEl.addEventListener('click', onAddComment, false)
-	createCommentInputEl.addEventListener(
-		'keydown',
-		e => {
-			if (e.key == 'Enter') {
-				onAddComment()
-			}
-		},
-		false,
-	)
-
-	renderComments()
+	render()
 }
 
-async function renderComments() {
+async function render() {
 	let comments
+
+	const commentsFormContainerEl = document.getElementById(
+		'comments-form-container',
+	)
+	const commentFormEl = CommentForm.render({
+		containerElId: '',
+		onAddComment: commentContent => onAddComment({ commentContent }),
+	})
+	commentsFormContainerEl.appendChild(commentFormEl)
 
 	startLoading('Fetching comments...')
 	try {
@@ -48,20 +45,51 @@ async function renderComments() {
 		stopLoading()
 	}
 
-	comments.forEach(_addCommentToCommentList)
+	// Only handling one level of nesting
+	comments.forEach(renderCommentInList)
 }
 
-async function onAddComment() {
+function renderCommentInList(comment) {
+	if (comment.parentId) {
+		const commentEl = Comment.render({
+			comment,
+			onUpvoteComment,
+			onReplyClick,
+		})
+
+		commentEl
+			.getElementsByClassName('comment-actions-container-reply')[0]
+			.remove()
+
+		const existingCommentEl = document
+			.getElementById(`comment-${comment.parentId}`)
+			.getElementsByClassName('main-comment-container')[0]
+
+		_insertAfter(commentEl, existingCommentEl)
+		return
+	}
+
+	const commentEl = Comment.render({
+		comment,
+		onUpvoteComment,
+		onReplyClick,
+		isMainComment: true && comment.children && comment.children.length > 0,
+	})
+
+	commentsListDocEl.appendChild(commentEl)
+}
+
+async function onAddComment({ commentContent = '', parentId = '' }) {
 	let createdComment
 
-	const content = createCommentInputEl.value
-	if (!content) return
+	if (!commentContent) return
 
 	try {
 		startLoading('Adding comment...')
 		createdComment = await postComment({
-			content,
+			content: commentContent,
 			authorId: Math.floor(Math.random() * 3) + 1,
+			parentId,
 		})
 	} catch {
 		alert("It's not possible to add a comment at the moment. Try later")
@@ -69,7 +97,13 @@ async function onAddComment() {
 		stopLoading()
 	}
 
-	_addCommentToCommentList(createdComment)
+	renderCommentInList(createdComment)
+
+	document.getElementById('comment')
+
+	document
+		.getElementById('comments-form-container')
+		.getElementsByClassName('create-comment-input')[0].value = ''
 }
 
 async function onUpvoteComment(comment) {
@@ -80,82 +114,33 @@ async function onUpvoteComment(comment) {
 	}
 }
 
+async function onReplyClick(comment) {
+	const commentFormContainerEl = document.createElement('div')
+	const commentEl = document.getElementById(`comment-${comment.id}`)
+
+	commentEl.querySelector('.vl').style = `${
+		commentEl.querySelector('.vl').style
+	} display:block`
+
+	const commentFormEl = CommentForm.render({
+		onAddComment: async commentContent => {
+			await onAddComment({ commentContent, parentId: comment.id })
+			commentFormContainerEl.remove()
+		},
+		style: 'margin-left:50px',
+	})
+
+	commentFormContainerEl.appendChild(commentFormEl)
+
+	_insertAfter(commentFormContainerEl, commentEl)
+}
+
 function startLoading(loadingMessage = '') {
-	createCommentInputEl.disabled = true
-	createCommentButtonEl.disabled = true
 	loaderEl.innerHTML = loadingMessage
 }
 
 function stopLoading() {
-	createCommentInputEl.disabled = false
-	createCommentButtonEl.disabled = false
 	loaderEl.innerHTML = ''
-}
-
-function _addCommentToCommentList(comment) {
-	const commentEl = document.createElement('div')
-
-	commentEl.innerHTML = `
-		<div class="comment-container" id="comment-${comment.id}">
-			<div class="comment-container-left">
-				<img src="${comment.author.avatarUrl}" alt="Avatar" class="avatar">
-			</div>
-
-			<div class="comment-container-right">
-				<div class="comment-container-header">
-					<div class="comment-container-header-author">
-						${comment.author.firstName} ${comment.author.lastName}
-					</div>
-					<div class="comment-container-header-separator">&bull;</div>
-					<div class="comment-container-header-published">
-						${formatDistance(new Date(comment.publishedAt), new Date(), {
-							addSuffix: true,
-						})}
-					</div>
-					<div class="comment-container-header-separator">&bull;</div>
-					<div class="comment-container-header-upvotes">
-						Upvoted <span class="comment-container-header-upvotes-value"></span> times
-					</div>
-				</div>
-
-				<div class="comment-container-content">
-					${comment.content}
-				</div>
-
-				<div class="comment-actions-container">
-					<div class="comment-actions-container-upvote" data-testid="upvote-comment">
-						<div class="comment-actions-container-upvote-icon">&#9652;</div>
-						<div>Upvote</div>
-					</div>
-					<div class="comment-actions-container-reply">Reply</div>
-				</div>
-			</div>
-		</div>
-	`
-
-	const upvoteButtonEl = commentEl.getElementsByClassName(
-		'comment-actions-container-upvote',
-	)[0]
-
-	upvoteButtonEl.addEventListener(
-		'click',
-		() => onUpvoteComment(comment),
-		false,
-	)
-
-	commentsListDocEl.appendChild(commentEl)
-
-	// Render the upvotes with React
-	const upvotesEl = commentEl.getElementsByClassName(
-		'comment-container-header-upvotes-value',
-	)[0]
-
-	ReactDOM.render(
-		React.createElement(Upvotes, { upvotes: comment.upvotes }),
-		upvotesEl,
-	)
-
-	createCommentInputEl.value = ''
 }
 
 function _increaseCommentUpvotes(commentId = '') {
@@ -173,4 +158,8 @@ function _increaseCommentUpvotes(commentId = '') {
 	)
 }
 
-init()
+function _insertAfter(newNode, existingNode) {
+	existingNode.parentNode.insertBefore(newNode, existingNode.nextSibling)
+}
+
+onMounted()

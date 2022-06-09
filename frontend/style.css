@@ -14,26 +14,26 @@
 	margin-bottom: 0;
 }
 
-#comments-form {
+.comments-form {
 	display: flex;
 	align-items: center;
 	color: #9a9eaa;
 	padding: 35px 0 35px 0;
 }
 
-#create-comment-input-container {
+.create-comment-input-container {
 	 margin-right: 20px;
 	 width: 100%;
 }
 
-#create-comment-input-container > input {
+.create-comment-input-container > input {
 	padding: 10px;
 	border-radius: 3px;
 	border: 1px solid #9a9eaa;
 	width: 97%;
 }
 
-#create-comment-button-container > button {
+.create-comment-button-container > button {
 	height: 36.55px;
 	color: #FFFFFF;
 	background-color: #7e35f7;
@@ -43,12 +43,12 @@
 	cursor: pointer;
 }
 
-#create-comment-button-container > button:disabled,
+.create-comment-button-container > button:disabled,
 button[disabled] {
 	background-color: #9a9eaa;
 }
 
-#avatar-container {
+.avatar-container {
 	margin-right: 20px;
 }
 
@@ -59,6 +59,14 @@ button[disabled] {
 	border-radius: 50%;
 }
 
+.vl {
+	border-left: 2px solid #dedfe6;
+    height: 100%;
+    position: absolute;
+	left: 19px;
+    top: 40px;
+  }
+
 #loader {
 	padding-top: 10px;
 	padding-bottom: 10px;
@@ -68,10 +76,13 @@ button[disabled] {
 .comment-container {
 	display: flex;
 	margin-top: 30px;
+	overflow: hidden;
+    position: relative;
+    width: 100%;
 }
 
 .comment-container-left {
-	margin-right: 20px;	
+	margin-right: 20px;
 }
 
 .comment-container-header {

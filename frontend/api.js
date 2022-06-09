@@ -2,6 +2,7 @@
  * @typedef CreateCommentDto
  * @type {object}
  * @property {string} content - comment's content
+ * @property {string} parentId - comment's parent id
  * @property {number} authorId - comment's author id
  */
 
@@ -12,6 +13,7 @@
  * @property {string} content - comment's content
  * @property {string} publishedAt - when comment was published
  * @property {CommentAuthor} author - comment's author
+ * @property {Comment[]} children - nested comments
  */
 
 /**
@@ -50,6 +52,7 @@ export async function postComment(commentDto) {
 		body: JSON.stringify({
 			content: commentDto.content,
 			authorId: commentDto.authorId,
+			parentId: commentDto.parentId,
 		}),
 	})
 
