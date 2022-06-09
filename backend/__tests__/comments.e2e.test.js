@@ -26,14 +26,16 @@ tap.test('Comments API', t => {
 				id: 1,
 				firstName: 'Jon',
 				lastName: 'Snow',
-				avatarUrl: 'https://i.pravatar.cc/300',
+				avatarUrl: String,
 			},
 			id: String,
 			publishedAt: String,
+			upvotes: 0,
 		}
 
+		const createdComment = addCommentResponse.body
 		t.same(addCommentResponse.status, 201)
-		t.match(addCommentResponse.body, expectedAddedComment)
+		t.match(createdComment, expectedAddedComment)
 
 		// Get comments
 		const getCommentsResponse = await request(app)
@@ -41,13 +43,17 @@ tap.test('Comments API', t => {
 			.set('Accept', 'application/json')
 
 		t.same(getCommentsResponse.status, 200)
-		t.match(getCommentsResponse.body, [expectedAddedComment])
+
+		const fetchedCreatedComment = getCommentsResponse.body.find(
+			comment => comment.id === createdComment.id,
+		)
+		t.match(fetchedCreatedComment, createdComment)
 
 		t.end()
 	})
 
-	tap.skip(
-		"It should return an error if the author's id is not sent when creating a comment",
+	tap.test(
+		"Create Comment - It should return an error if the author's id is not sent when creating a comment",
 		async t => {
 			const addCommentResponse = await request(app)
 				.post('/api/comments')
@@ -64,8 +70,8 @@ tap.test('Comments API', t => {
 		},
 	)
 
-	tap.skip(
-		'It should return an error if the content is not sent when creating a comment',
+	tap.test(
+		'Create Comment - It should return an error if the content is not sent when creating a comment',
 		async t => {
 			const addCommentResponse = await request(app)
 				.post('/api/comments')
@@ -82,26 +88,84 @@ tap.test('Comments API', t => {
 		},
 	)
 
-	tap.skip('It should return an error if author does not exist', async t => {
-		const notExistingAuthorId = 100
+	tap.test(
+		'Create Comment - It should return an error if author does not exist',
+		async t => {
+			const notExistingAuthorId = 100
+
+			const addCommentResponse = await request(app)
+				.post('/api/comments')
+				.send(
+					createCommentDto({
+						overrides: { authorId: notExistingAuthorId },
+					}),
+				)
+				.set('Accept', 'application/json')
+
+			t.same(addCommentResponse.status, 400)
+			t.same(addCommentResponse.body, {
+				message: `Author with id ${notExistingAuthorId} does not exist`,
+				field: 'authorId',
+			})
+
+			t.end()
+		},
+	)
+
+	tap.test('Upvote a comment - Happy Path', async t => {
+		// Create comment
+		const commentToCreate = createCommentDto({
+			overrides: {
+				authorId: users[0].id,
+			},
+		})
 
 		const addCommentResponse = await request(app)
 			.post('/api/comments')
-			.send(
-				createCommentDto({
-					overrides: { authorId: notExistingAuthorId },
-				}),
-			)
+			.send(commentToCreate)
 			.set('Accept', 'application/json')
 
-		t.same(addCommentResponse.status, 400)
-		t.same(addCommentResponse.body, {
-			message: `Author with id ${notExistingAuthorId} does not exist`,
-			field: 'authorId',
-		})
+		const createdComment = addCommentResponse.body
+
+		const upvoteCommentResponse = await request(app).post(
+			`/api/comments/${createdComment.id}/upvote`,
+		)
+
+		t.same(upvoteCommentResponse.status, 200)
+
+		// Get comments
+		const getCommentsResponse = await request(app)
+			.get('/api/comments')
+			.set('Accept', 'application/json')
+
+		// console.log(createdComment)
+
+		const createdCommentWithNewUpvotes = getCommentsResponse.body.find(
+			comment => comment.id === createdComment.id,
+		)
+		t.match(createdCommentWithNewUpvotes, { ...createdComment, upvotes: 1 })
 
 		t.end()
 	})
+
+	tap.test(
+		'Upvote a comment - It should return an error if comment id does not exist',
+		async t => {
+			const notExistingCommentId = 100
+
+			const upvoteCommentResponse = await request(app).post(
+				`/api/comments/${notExistingCommentId}/upvote`,
+			)
+
+			t.same(upvoteCommentResponse.status, 400)
+			t.same(upvoteCommentResponse.body, {
+				message: `Comment with id ${notExistingCommentId} does not exist`,
+				param: 'id',
+			})
+
+			t.end()
+		},
+	)
 
 	t.end()
 })
