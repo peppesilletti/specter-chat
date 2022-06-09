@@ -1,4 +1,4 @@
-import { getComments, postComment } from './api'
+import { getComments, postComment, upvoteComment } from './api'
 import formatDistance from 'date-fns/formatDistance'
 import './style.css'
 
@@ -46,7 +46,10 @@ async function onAddComment() {
 
 	try {
 		startLoading('Adding comment...')
-		createdComment = await postComment({ content, authorId: 1 })
+		createdComment = await postComment({
+			content,
+			authorId: Math.floor(Math.random() * 3) + 1,
+		})
 	} catch {
 		alert("It's not possible to add a comment at the moment. Try later")
 	} finally {
@@ -54,6 +57,16 @@ async function onAddComment() {
 	}
 
 	_addCommentToCommentList(createdComment)
+}
+
+async function onUpvoteComment(comment) {
+	try {
+		await upvoteComment(comment.id)
+	} catch {
+		alert("It's not possible to upvote the comment at the moment. Try later")
+	}
+
+	_increaseCommentUpvotes(comment.id)
 }
 
 function startLoading(loadingMessage = '') {
@@ -72,7 +85,7 @@ function _addCommentToCommentList(comment) {
 	const commentEl = document.createElement('div')
 
 	commentEl.innerHTML = `
-		<div class="comment-container">
+		<div class="comment-container" id="comment-${comment.id}">
 			<div class="comment-container-left">
 				<img src="${comment.author.avatarUrl}" alt="Avatar" class="avatar">
 			</div>
@@ -88,25 +101,53 @@ function _addCommentToCommentList(comment) {
 							addSuffix: true,
 						})}
 					</div>
+					<div class="comment-container-header-separator">&bull;</div>
+					<div class="comment-container-header-upvotes">
+						Upvoted <span class="comment-container-header-upvotes-value">${
+							comment.upvotes
+						}</span> times
+					</div>
 				</div>
 
 				<div class="comment-container-content">
 					${comment.content}
 				</div>
 
-				<div class="comment-actions-content">
-					<div class="comment-actions-content-upvote">
-						<div class="comment-actions-content-upvote-icon">&#9652;</div>
+				<div class="comment-actions-container">
+					<div class="comment-actions-container-upvote">
+						<div class="comment-actions-container-upvote-icon">&#9652;</div>
 						<div>Upvote</div>
 					</div>
-					<div class="comment-actions-content-reply">Reply</div>
+					<div class="comment-actions-container-reply">Reply</div>
 				</div>
 			</div>
 		</div>
 	`
 
+	const upvoteButtonEl = commentEl.getElementsByClassName(
+		'comment-actions-container-upvote',
+	)[0]
+
+	upvoteButtonEl.addEventListener(
+		'click',
+		() => onUpvoteComment(comment),
+		false,
+	)
+
 	commentsListDocEl.appendChild(commentEl)
 	createCommentInputEl.value = ''
+}
+
+function _increaseCommentUpvotes(commentId = '') {
+	const commentEl = document.getElementById(`comment-${commentId}`)
+	const upvotesEl = commentEl.querySelector('.comment-container-header-upvotes')
+	const currentUpvotesValueEl = upvotesEl.querySelector(
+		'.comment-container-header-upvotes-value',
+	)
+	const currentUpvotesValue = currentUpvotesValueEl.innerHTML
+	const newUpvotesValue = `${parseInt(currentUpvotesValue) + 1}`
+
+	currentUpvotesValueEl.innerHTML = newUpvotesValue
 }
 
 init()

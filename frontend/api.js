@@ -59,6 +59,15 @@ export async function postComment(commentDto) {
 	return rawResponse.json()
 }
 
+export async function upvoteComment(commentId = '') {
+	await fetch(`http://localhost:3001/api/comments/${commentId}/upvote`, {
+		method: 'POST',
+	})
+
+	// fake some latency
+	// pause(2000)
+}
+
 function pause(milliseconds) {
 	var dt = new Date()
 	while (new Date() - dt <= milliseconds) {

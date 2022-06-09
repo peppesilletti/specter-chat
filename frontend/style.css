@@ -85,7 +85,7 @@ button[disabled] {
 	font-weight: bold;
 }
 
-.comment-container-header-published {
+.comment-container-header-published, .comment-container-header-upvotes {
 	font-size: 0.8rem;
 	color: #757679;
 }
@@ -96,7 +96,7 @@ button[disabled] {
 	color: #9a9eaa;
 }
 
-.comment-actions-content {
+.comment-actions-container {
 	display: flex;
 	align-items: center;
 	margin-top: 10px;
@@ -105,18 +105,18 @@ button[disabled] {
 	font-weight: 600;
 }
 
-.comment-actions-content-upvote {
+.comment-actions-container-upvote {
 	margin-right: 20px;
 	display: flex;
 	align-items: center;
 	cursor: pointer;
 }
 
-.comment-actions-content-upvote-icon {
+.comment-actions-container-upvote-icon {
 	margin-right: 10px;
 	font-size: 0.8rem;
 }
 
-.comment-actions-content-reply {
+.comment-actions-container-reply {
 	cursor: pointer;
 }
