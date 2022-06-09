@@ -138,8 +138,6 @@ tap.test('Comments API', t => {
 			.get('/api/comments')
 			.set('Accept', 'application/json')
 
-		// console.log(createdComment)
-
 		const createdCommentWithNewUpvotes = getCommentsResponse.body.find(
 			comment => comment.id === createdComment.id,
 		)
