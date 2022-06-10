@@ -7,7 +7,7 @@
 		"dev": "nodemon",
 		"test": "tap --node-arg=--experimental-specifier-resolution=node",
 		"test:dev": "tap --node-arg=--experimental-specifier-resolution=node --watch",
-		"setup:db": "node  ./db/setup.js"
+		"setup:db": "node ./db/setup.js"
 	},
 	"dependencies": {
 		"@nearform/sql": "^1.9.2",
