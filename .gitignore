@@ -3,3 +3,4 @@ backend/node_modules
 backend/.nyc_output
 frontend/dist
 backend/.env.local
+backend/.env.production
