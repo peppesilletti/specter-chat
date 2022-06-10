@@ -1,0 +1,20 @@
+{
+	"name": "specter-chat",
+	"version": "1.0.0",
+	"description": "Specter Chat",
+	"main": "index.js",
+	"scripts": {
+		"heroku-prebuild": "cd backend && npm install",
+		"start": "cd backend && npm start"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/peppesilletti/specter-chat.git"
+	},
+	"author": "",
+	"license": "ISC",
+	"bugs": {
+		"url": "https://github.com/peppesilletti/specter-chat/issues"
+	},
+	"homepage": "https://github.com/peppesilletti/specter-chat#readme"
+}
