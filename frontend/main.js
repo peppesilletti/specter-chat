@@ -50,7 +50,7 @@ async function render() {
 function renderCommentList(comments) {
 	const commentListEl = CommentList.render({
 		comments,
-		onReplyClick,
+		onAddComment,
 		onUpvoteComment,
 	})
 
@@ -112,32 +112,6 @@ async function onUpvoteComment(comment) {
 	} catch {
 		alert("It's not possible to upvote the comment at the moment. Try later")
 	}
-}
-
-async function onReplyClick(comment) {
-	const commentFormContainerEl = document.createElement('div')
-	const currentCommentEl = document.getElementById(`comment-${comment.id}`)
-
-	currentCommentEl.replaceWith(
-		Comment.render({
-			comment,
-			onUpvoteComment,
-		}),
-	)
-
-	const newCommentEl = document.getElementById(`comment-${comment.id}`)
-
-	const commentFormEl = CommentForm.render({
-		onAddComment: async commentContent => {
-			await onAddComment({ commentContent, parentId: comment.id })
-			commentFormContainerEl.remove()
-		},
-		style: 'margin-left:50px',
-	})
-
-	commentFormContainerEl.appendChild(commentFormEl)
-
-	U.insertAfter(commentFormContainerEl, newCommentEl)
 }
 
 function startLoading(loadingMessage = '') {

@@ -2,4 +2,8 @@ function insertAfter(newNode, existingNode) {
 	existingNode.parentNode.insertBefore(newNode, existingNode.nextSibling)
 }
 
-export default { insertAfter }
+function insertBefore(newNode, existingNode) {
+	existingNode.parentNode.insertBefore(newNode, existingNode)
+}
+
+export default { insertAfter, insertBefore }
