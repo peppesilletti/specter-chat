@@ -1,6 +1,6 @@
 Specter Chat
 
-### For development
+### For development
 1. Create PG instance: docker run --name spectrum-chat -e POSTGRES_PASSWORD=mysecretpassword -e POSTGRES_DB=specter-db -d postgres
 2. Duplicate .env.local.example and rename to .env.local
 3. Add Postgres config 
