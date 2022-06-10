@@ -3,17 +3,28 @@ import request from 'supertest'
 import { faker } from '@faker-js/faker'
 
 import app from '../app'
+import db from '../db/db'
 
 import users from '../fixtures/users.json'
 
+tap.before(() => {
+	return db.connect()
+})
+
+tap.teardown(() => {
+	return db.end()
+})
+
 tap.test('Comments API', t => {
-	tap.skip('Create and fetch comments - Happy Path', async t => {
+	tap.test('Create and fetch comments - Happy Path', async t => {
 		// Create comment
 		const commentToCreate = createCommentDto({
 			overrides: {
 				authorId: users[0].id,
 			},
 		})
+
+		console.log('hello!')
 
 		const addCommentResponse = await request(app)
 			.post('/api/comments')
@@ -97,7 +108,7 @@ tap.test('Comments API', t => {
 		t.end()
 	})
 
-	tap.skip(
+	tap.test(
 		"Create Comment - It should return an error if the author's id is not sent when creating a comment",
 		async t => {
 			const addCommentResponse = await request(app)
@@ -115,7 +126,7 @@ tap.test('Comments API', t => {
 		},
 	)
 
-	tap.skip(
+	tap.test(
 		'Create Comment - It should return an error if the content is not sent when creating a comment',
 		async t => {
 			const addCommentResponse = await request(app)
@@ -133,7 +144,7 @@ tap.test('Comments API', t => {
 		},
 	)
 
-	tap.skip(
+	tap.test(
 		'Create Comment - It should return an error if author does not exist',
 		async t => {
 			const notExistingAuthorId = 100
@@ -157,7 +168,7 @@ tap.test('Comments API', t => {
 		},
 	)
 
-	tap.skip('Upvote a comment - Happy Path', async t => {
+	tap.test('Upvote a comment - Happy Path', async t => {
 		// Create comment
 		const commentToCreate = createCommentDto({
 			overrides: {
@@ -191,7 +202,7 @@ tap.test('Comments API', t => {
 		t.end()
 	})
 
-	tap.skip(
+	tap.test(
 		'Upvote a comment - It should return an error if comment id does not exist',
 		async t => {
 			const notExistingCommentId = 100
@@ -216,6 +227,7 @@ tap.test('Comments API', t => {
 function createCommentDto({ overrides = {} } = {}) {
 	return {
 		content: faker.random.words(),
+		parentId: '',
 		...overrides,
 	}
 }

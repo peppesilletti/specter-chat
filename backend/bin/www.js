@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-
 /**
  * Module dependencies.
  */
@@ -8,6 +7,7 @@ import app from '../app'
 import debug from 'debug'
 import http from 'http'
 import { Server } from 'socket.io'
+import db from '../db/db'
 
 /**
  * Get port from environment and store in Express.
@@ -34,14 +34,6 @@ const io = new Server(server, {
 })
 
 app.io = io
-
-/**
- * Listen on provided port, on all network interfaces.
- */
-
-server.listen(port)
-server.on('error', onError)
-server.on('listening', onListening)
 
 /**
  * Normalize a port into a number, string, or false.
@@ -98,5 +90,18 @@ function onListening() {
 	const bind = typeof addr === 'string' ? 'pipe ' + addr : 'port ' + addr.port
 	debug('backend:server')('Listening on ' + bind)
 }
+
+async function main() {
+	await db.connect()
+
+	/**
+	 * Listen on provided port, on all network interfaces.
+	 */
+	server.listen(port)
+	server.on('error', onError)
+	server.on('listening', onListening)
+}
+
+main()
 
 export default server
