@@ -21,7 +21,8 @@ const commentsFormContainerEl = document.getElementById(
 const loaderEl = document.getElementById('loader')
 
 function onMounted() {
-	const socket = io('http://localhost:3001')
+	const apiEndpoint = import.meta.env.VITE_API_DOMAIN || 'http://localhost:3001'
+	const socket = io(apiEndpoint)
 
 	socket.on('COMMENT_UPVOTED', ({ commentId }) => {
 		_increaseCommentUpvotes(commentId)
