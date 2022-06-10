@@ -4,10 +4,8 @@ import ReactDOM from 'react-dom'
 import Upvotes from './components/Upvotes'
 
 import { getComments, postComment, upvoteComment } from './api'
-import U from './components/utils'
 
 import CommentForm from './components/CommentForm'
-import Comment from './components/Comment'
 import CommentList from './components/CommentList'
 
 import './style.css'
