@@ -26,12 +26,14 @@
  * @property {string} avatarUrl - author's avatar URL
  */
 
+const apiEndpoint = import.meta.env.VITE_API_DOMAIN || 'http://localhost:3001'
+
 /**
  * Get all the comments
  * @returns {Comment[]}
  */
 export async function getComments() {
-	const rawResponse = await fetch('http://localhost:3001/api/comments')
+	const rawResponse = await fetch(`${apiEndpoint}/api/comments`)
 
 	// fake some latency
 	// pause(2000)
@@ -45,7 +47,7 @@ export async function getComments() {
  * @returns {Comment}
  */
 export async function postComment(commentDto) {
-	const rawResponse = await fetch('http://localhost:3001/api/comments', {
+	const rawResponse = await fetch(`${apiEndpoint}/api/comments`, {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json',
@@ -64,7 +66,7 @@ export async function postComment(commentDto) {
 }
 
 export async function upvoteComment(commentId = '') {
-	await fetch(`http://localhost:3001/api/comments/${commentId}/upvote`, {
+	await fetch(`${apiEndpoint}/api/comments/${commentId}/upvote`, {
 		method: 'POST',
 	})
 
