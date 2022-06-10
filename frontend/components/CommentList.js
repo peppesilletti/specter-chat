@@ -24,7 +24,7 @@ function render({ comments, onUpvoteComment, onAddComment, style = '' }) {
 		.forEach(comment => {
 			const replyFormEl = renderReplyForm(async commentContent => {
 				await onAddComment({ commentContent, parentId: comment.id })
-				commentFormContainerEl.remove()
+				replyFormEl.remove()
 			})
 
 			const commentEl = Comment.render({

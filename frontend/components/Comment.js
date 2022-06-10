@@ -45,7 +45,7 @@ function render({ comment, onUpvoteComment, onReplyClick, style = '' }) {
 							<div class="comment-actions-container-upvote-icon">&#9652;</div>
 							<div>Upvote</div>
 						</div>
-						<div class="comment-actions-container-reply">Reply</div>
+						<div class="comment-actions-container-reply" data-testid="comment-actions-container-reply">Reply</div>
 					</div>
 				</div>
 			</div>
