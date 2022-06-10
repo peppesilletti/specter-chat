@@ -4,14 +4,22 @@ import ReactDOM from 'react-dom'
 import Upvotes from './components/Upvotes'
 
 import { getComments, postComment, upvoteComment } from './api'
+import U from './components/utils'
 
 import CommentForm from './components/CommentForm'
 import Comment from './components/Comment'
+import CommentList from './components/CommentList'
 
 import './style.css'
 
+// Cache
+let comments = []
+
 // Elements refs
 const commentsListDocEl = document.getElementById('comments-container')
+const commentsFormContainerEl = document.getElementById(
+	'comments-form-container',
+)
 const loaderEl = document.getElementById('loader')
 
 function onMounted() {
@@ -25,17 +33,7 @@ function onMounted() {
 }
 
 async function render() {
-	let comments
-
-	const commentsFormContainerEl = document.getElementById(
-		'comments-form-container',
-	)
-	const commentFormEl = CommentForm.render({
-		containerElId: '',
-		onAddComment: commentContent => onAddComment({ commentContent }),
-	})
-	commentsFormContainerEl.appendChild(commentFormEl)
-
+	// Fetch and render comments list
 	startLoading('Fetching comments...')
 	try {
 		comments = await getComments()
@@ -45,38 +43,28 @@ async function render() {
 		stopLoading()
 	}
 
-	// Only handling one level of nesting
-	comments.forEach(renderCommentInList)
+	renderForm()
+	renderCommentList(comments)
 }
 
-function renderCommentInList(comment) {
-	if (comment.parentId) {
-		const commentEl = Comment.render({
-			comment,
-			onUpvoteComment,
-			onReplyClick,
-		})
-
-		commentEl
-			.getElementsByClassName('comment-actions-container-reply')[0]
-			.remove()
-
-		const existingCommentEl = document
-			.getElementById(`comment-${comment.parentId}`)
-			.getElementsByClassName('main-comment-container')[0]
-
-		_insertAfter(commentEl, existingCommentEl)
-		return
-	}
-
-	const commentEl = Comment.render({
-		comment,
-		onUpvoteComment,
+function renderCommentList(comments) {
+	const commentListEl = CommentList.render({
+		comments,
 		onReplyClick,
-		isMainComment: true && comment.children && comment.children.length > 0,
+		onUpvoteComment,
 	})
 
-	commentsListDocEl.appendChild(commentEl)
+	commentsListDocEl.childNodes[0].replaceWith(commentListEl)
+}
+
+function renderForm() {
+	// Render form
+	const commentFormEl = CommentForm.render({
+		containerElId: '',
+		onAddComment: commentContent => onAddComment({ commentContent }),
+	})
+
+	commentsFormContainerEl.appendChild(commentFormEl)
 }
 
 async function onAddComment({ commentContent = '', parentId = '' }) {
@@ -91,19 +79,31 @@ async function onAddComment({ commentContent = '', parentId = '' }) {
 			authorId: Math.floor(Math.random() * 3) + 1,
 			parentId,
 		})
+
+		comments = [...comments, createdComment]
+
+		if (parentId) {
+			const parentIndex = comments.findIndex(comment => comment.id === parentId)
+			const newParentChildren = [
+				...comments[parentIndex].children,
+				createdComment,
+			]
+			comments[parentIndex] = {
+				...comments[parentIndex],
+				children: newParentChildren,
+			}
+		}
+
+		renderCommentList(comments)
 	} catch {
 		alert("It's not possible to add a comment at the moment. Try later")
 	} finally {
 		stopLoading()
+
+		commentsFormContainerEl.getElementsByClassName(
+			'create-comment-input',
+		)[0].value = ''
 	}
-
-	renderCommentInList(createdComment)
-
-	document.getElementById('comment')
-
-	document
-		.getElementById('comments-form-container')
-		.getElementsByClassName('create-comment-input')[0].value = ''
 }
 
 async function onUpvoteComment(comment) {
@@ -116,11 +116,16 @@ async function onUpvoteComment(comment) {
 
 async function onReplyClick(comment) {
 	const commentFormContainerEl = document.createElement('div')
-	const commentEl = document.getElementById(`comment-${comment.id}`)
+	const currentCommentEl = document.getElementById(`comment-${comment.id}`)
 
-	commentEl.querySelector('.vl').style = `${
-		commentEl.querySelector('.vl').style
-	} display:block`
+	currentCommentEl.replaceWith(
+		Comment.render({
+			comment,
+			onUpvoteComment,
+		}),
+	)
+
+	const newCommentEl = document.getElementById(`comment-${comment.id}`)
 
 	const commentFormEl = CommentForm.render({
 		onAddComment: async commentContent => {
@@ -132,7 +137,7 @@ async function onReplyClick(comment) {
 
 	commentFormContainerEl.appendChild(commentFormEl)
 
-	_insertAfter(commentFormContainerEl, commentEl)
+	U.insertAfter(commentFormContainerEl, newCommentEl)
 }
 
 function startLoading(loadingMessage = '') {
@@ -156,10 +161,6 @@ function _increaseCommentUpvotes(commentId = '') {
 		React.createElement(Upvotes, { upvotes: newUpvotesValue }),
 		currentUpvotesValueEl,
 	)
-}
-
-function _insertAfter(newNode, existingNode) {
-	existingNode.parentNode.insertBefore(newNode, existingNode.nextSibling)
 }
 
 onMounted()

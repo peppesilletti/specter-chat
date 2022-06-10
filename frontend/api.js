@@ -12,6 +12,7 @@
  * @property {string} id - comment's id
  * @property {string} content - comment's content
  * @property {string} publishedAt - when comment was published
+ * @property {string} parentId - comment's parentId
  * @property {CommentAuthor} author - comment's author
  * @property {Comment[]} children - nested comments
  */

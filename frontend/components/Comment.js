@@ -4,14 +4,10 @@ import formatDistance from 'date-fns/formatDistance'
 
 import Upvotes from './Upvotes'
 
-function render({
-	comment,
-	onUpvoteComment,
-	onReplyClick,
-	style = '',
-	isMainComment = false,
-}) {
+function render({ comment, onUpvoteComment, onReplyClick, style = '' }) {
 	const commentEl = document.createElement('div')
+	const isMainComment =
+		comment.children && comment.children.length > 0 && !comment.parentId
 
 	const commentHtml = `
 		<div class="comment-container" id="comment-${comment.id}" style=${style}>
